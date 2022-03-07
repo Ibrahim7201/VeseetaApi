@@ -1,8 +1,7 @@
-//Modules
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 dotenv.config({ path: "./config.env" });
-//Schema
+
 let doctorSchemaOptions = {
   toJSON: {
     virtuals: true,

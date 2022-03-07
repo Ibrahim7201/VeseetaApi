@@ -1,38 +1,9 @@
 const express = require("express");
 const router = express.Router();
-const authController = require("./authController");
-const doctorController = require("./doctorController");
-const multer = require("multer");
-const { replaceOne } = require("./userModel");
+const authController = require("../controllers/authController");
+const doctorController = require("../controllers/doctorController");
+const upload = require("../utils/multer");
 
-/////////////////////
-/* Multer Settings */
-/////////////////////
-const multerStorage = multer.diskStorage({
-  /* I am using Temp */
-  // destination: (req, file, cb) => {
-  //   cb(null, "public/imgs");
-  // },
-  filename: (req, file, cb) => {
-    const ext = file.mimetype.split("/")[1];
-    cb(null, `user-${Date.now()}.${ext}`);
-  },
-});
-const multerFilter = (req, file, cb) => {
-  if (file.mimetype.startsWith("image")) {
-    cb(null, true);
-  } else {
-    cb(new Error("It's not an IMAGE !", 400), false);
-  }
-};
-const upload = multer({
-  storage: multerStorage,
-  fileFlter: multerFilter,
-});
-
-////////////////
-/* App Routes */
-////////////////
 router.post("/img", upload.single("photo"), authController.uploadImage);
 //Signing Up
 router.post("/signup", authController.signup);

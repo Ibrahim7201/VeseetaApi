@@ -1,10 +1,8 @@
-//Modules
 const mongoose = require("mongoose");
 const validator = require("validator");
 const bcrypt = require("bcryptjs");
 const dotenv = require("dotenv");
-dotenv.config({ path: "./config.env" });
-//Schema
+dotenv.config({ path: "../config.env" });
 let userSchemaOptions = {
   toJSON: {
     virtuals: true,
@@ -110,6 +108,7 @@ userSchema.pre("save", async function (next) {
 userSchema.methods.correctPassword = async function (enteredPassword, userPassword) {
   return await bcrypt.compare(enteredPassword, userPassword);
 };
+
 userSchema.methods.changedPasswordAfter = function (JWTTimeStamp) {
   if (this.passwordChangedAt) {
     const changedTimeStamp = parseInt(this.passwordChangedAt.getTime() / 1000, 10);

@@ -1,7 +1,7 @@
-const Doctor = require("./doctorModel");
+const Doctor = require("../models/doctorModel");
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
-dotenv.config({ path: "./config.env" });
+dotenv.config({ path: "../config.env" });
 const { promisify } = require("util");
 
 exports.addDoctor = async (req, res, next) => {

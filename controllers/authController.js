@@ -1,15 +1,10 @@
-const User = require("./userModel");
+const User = require("../models/userModel");
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
-dotenv.config({ path: "./config.env" });
+dotenv.config({ path: "../config.env" });
 const { promisify } = require("util");
-const cloudinary = require("cloudinary").v2;
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_NAME,
-  api_key: process.env.CLOUDINARY_API,
-  api_secret: process.env.CLOUDINARY_SECRET,
-});
-const streamifier = require("streamifier");
+const cloudinary = require("../utils/cloudinary");
+
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES,
@@ -27,7 +22,6 @@ const createSendToken = (user, statusCode, res) => {
   }
   res.cookie("jwt", token, cookieOption);
 
-  //Removing Password from output
   user.password = undefined;
   res.status(statusCode).json({
     status: "success",
@@ -39,7 +33,6 @@ const createSendToken = (user, statusCode, res) => {
 };
 
 exports.protect = async (req, res, next) => {
-  //1:Get token and check if it is correct
   try {
     let token;
     if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
@@ -51,19 +44,15 @@ exports.protect = async (req, res, next) => {
     if (!token) {
       return next(`User is not logged in please login first`);
     }
-    //2:Verification token
     const payLoad = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
-    //3:Check if user still exists
 
     const freshUser = await User.findById(payLoad.id);
     if (!freshUser) {
       return next("User belongs to this token no longer exists");
     }
-    //4:Check if user changed password after the token was issued
     if (freshUser.changedPasswordAfter(payLoad.iat)) {
       return next(`User changed password after the token was issued`);
     }
-    //Grant access to protected route
     req.user = freshUser;
     next();
   } catch (err) {
@@ -100,17 +89,14 @@ exports.signup = async (req, res, next) => {
 exports.login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
-    //1:Check if email and password exist
     if (!email || !password) {
       return res.json({ status: "error missing parameter" });
     }
-    //2:Check if user exists && password is correct
     const user = await User.findOne({ email }).select("+password");
 
     if (!user || !(await user.correctPassword(password, user.password))) {
       return next("Incorrect Password or email", 400);
     }
-    //3:Everything OK? send token to client
     const userName = user.name.toString();
     res.cookie("name", userName, {
       expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRES * 24 * 60 * 60 * 1000),
