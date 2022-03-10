@@ -7,7 +7,7 @@ const app = express();
 const morgan = require("morgan");
 const port = process.env.PORT || 3000;
 const cors = require("cors");
-const router = require("./routers/veseetaRouter");
+const router = require("./routers/Router");
 const cookieParser = require("cookie-parser");
 
 const onlineDB = process.env.DATABASE.replace("<PASSWORD>", process.env.DATABASE_PASSWORD);
@@ -16,7 +16,7 @@ const localDB = process.env.DATABASE_LOCAL;
 main();
 async function main() {
   try {
-    await mongoose.connect(onlineDB);
+    await mongoose.connect(localDB);
   } catch (err) {
     console.log(err.message);
   }
