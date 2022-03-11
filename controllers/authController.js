@@ -64,6 +64,8 @@ exports.protect = async (req, res, next) => {
 exports.signup = async (req, res, next) => {
   try {
     const { name, image, password, email, passwordConfirmation, passwordChangedAt, role, phones } = req.body;
+    const user = await User.find({ email });
+    if (user[0]) throw new Error("User Exists");
     const newUser = await User.create({ name, image, password, email, passwordConfirmation, passwordChangedAt, role, phones });
     res.cookie("name", newUser.name.toString(), {
       expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRES * 24 * 60 * 60 * 1000),
@@ -125,3 +127,16 @@ exports.restrictTo = (...roles) => {
     next();
   };
 };
+
+exports.forgetPassword = async (req, res, next) => {
+  try {
+    const user = await User.findOne({ email: req.body.email });
+    if (!user) {
+      return next(`There is no user with this email address`);
+    }
+    const resetToken = user.createPasswordResetToken();
+    await user.save({ validateBeforeSave: false });
+    res.send("Done");
+  } catch (err) {}
+};
+exports.resetPassword = async (req, res, next) => {};

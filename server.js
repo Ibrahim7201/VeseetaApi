@@ -21,6 +21,7 @@ async function main() {
     console.log(err.message);
   }
 }
+app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded());
@@ -29,13 +30,6 @@ app.use(express.static(`${__dirname}/public`));
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("tiny"));
 }
-app.use(function (req, res, next) {
-  res.setHeader("Access-Control-Allow-Origin", "http://localhost:4200");
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, PATCH, DELETE");
-  res.setHeader("Access-Control-Allow-Headers", "X-Requested-With,content-type");
-  res.setHeader("Access-Control-Allow-Credentials", true);
-  next();
-});
 
 app.use("/", router);
 app.listen(port, () => {

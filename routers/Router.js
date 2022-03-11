@@ -7,6 +7,8 @@ const upload = require("../utils/multer");
 
 //Auth
 router.route("/auth").get(authController.login).post(authController.signup).delete(authController.logout);
+router.post("/forgotPassword", authController.forgetPassword);
+router.post("/resetPassword", authController.resetPassword);
 //Doctors
 router.route("/doctors").get(authController.protect, doctorController.getDoctors).post(authController.protect, authController.restrictTo("admin"), doctorController.addDoctor);
 router.route("/doctors/:id").delete(authController.protect, authController.restrictTo("admin"), doctorController.deleteDoctor).patch(authController.protect, authController.restrictTo("admin"), doctorController.editDoctor);
