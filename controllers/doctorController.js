@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
 dotenv.config({ path: '../config.env' });
 const { promisify } = require('util');
+const AppError = require('../utils/appError');
 
 exports.addDoctor = async (req, res, next) => {
   try {
@@ -37,9 +38,7 @@ exports.addDoctor = async (req, res, next) => {
       },
     });
   } catch (err) {
-    err.statusCode = 404;
-    err.code = 'Error in Adding doctor';
-    next(err);
+    next(new AppError('Error in Adding doctor', 404));
   }
 };
 
@@ -51,9 +50,7 @@ exports.getDoctors = async (req, res, next) => {
       Data: doctors,
     });
   } catch (err) {
-    err.statusCode = 404;
-    err.code = 'Error in Getting Doctors';
-    next(err);
+    next(new AppError('Error in Getting Doctors', 404));
   }
 };
 
@@ -66,9 +63,7 @@ exports.deleteDoctor = async (req, res, next) => {
       .status(201)
       .json({ status: `Deleted Dr. ${doctor[0].name} Successfully` });
   } catch (err) {
-    err.statusCode = 404;
-    err.code = 'Error in Deleting doctor';
-    next(err);
+    next(new AppError('Error in Deleting doctor', 404));
   }
 };
 exports.editDoctor = async (req, res, next) => {
@@ -104,9 +99,7 @@ exports.editDoctor = async (req, res, next) => {
     );
     res.status(201).json({ status: 'Done Editing' });
   } catch (err) {
-    err.statusCode = 404;
-    err.code = 'Error in editing doctor';
-    next(err);
+    next(new AppError('Error in editing doctor', 404));
   }
 };
 exports.rateDoctor = async (req, res, next) => {
@@ -119,9 +112,7 @@ exports.rateDoctor = async (req, res, next) => {
     await Doctor.findByIdAndUpdate({ _id }, { rates: doctorRate });
     res.json('Rate Added Successfully');
   } catch (err) {
-    err.statusCode = 404;
-    err.code = 'Error in Rating doctor';
-    next(err);
+    next(new AppError('Error in Rating doctor', 404));
   }
 };
 
@@ -153,9 +144,7 @@ exports.reservingDoctor = async (req, res, next) => {
     );
     res.status(201).json({ status: 'Done Reserving for Doctor' });
   } catch (err) {
-    err.statusCode = 422;
-    err.code = 'Error in reservation for Doctor';
-    next(err);
+    next(new AppError('Error in reservation for Doctor', 422));
   }
 };
 exports.cancelReservationDoctor = async (req, res, next) => {
@@ -177,8 +166,6 @@ exports.cancelReservationDoctor = async (req, res, next) => {
     );
     res.status(201).json({ status: 'Done Cancelling for doctor' });
   } catch (err) {
-    err.statusCode = 422;
-    err.code = 'Error in reservation for Doctor';
-    next(err);
+    next(new AppError('Error in reservation for Doctor', 422));
   }
 };
